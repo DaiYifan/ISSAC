@@ -1,0 +1,104 @@
+read "/root/jiubianxing/H.m":  # 5 polynomials
+map(nops,H);  #[141, 91, 87, 94, 76]
+
+v := [S, x3, x5, y5, y8];
+for i to 5 do print(map2(degree, op(i, H), v)) end do:
+
+j1:=resultant(op(1,H), op(5,H), y8):
+save j1, "/root/jiubianxing/j1.m":
+j2:=resultant(op(2,H), op(5,H), y8):
+save j2, "/root/jiubianxing/j2.m":
+j3:=resultant(op(3,H), op(5,H), y8):
+save j3, "/root/jiubianxing/j3.m":
+j4:=resultant(op(4,H), op(5,H), y8):
+save j4, "/root/jiubianxing/j4.m":
+J:=[j1,j2,j3,j4]:
+save J, "/root/jiubianxing/J.m":
+
+j11:=simplify(j1/x5):
+j11:=simplify(j11/(-x3*y5+2*S-3)):
+j22:=simplify(j2/x5):
+j33:=simplify(j3/(-x3*y5+2*S-3)):
+j44:=simplify(j4/x5):
+
+v := [S, x3, x5, y5];
+map2(degree, j11, v);
+map2(degree, j22, v);
+map2(degree, j33, v);
+map2(degree, j44, v);
+
+multires:=proc(f1,f2,x)
+	local result,i,j,f11,f22,item1,item2,len1,len2:
+	result:=1:
+	f11:=op(2,factors(f1)):
+	f22:=op(2,factors(f2)):
+	len1:=nops(f11):
+	len2:=nops(f22):
+	for i from 1 to len1 do
+		for j from 1 to len2 do
+			item1:=numer(op(1,op(i,f11))):
+			item2:=numer(op(1,op(j,f22))):
+			if nops(indets(item1))<=0 then
+				item1:=1:
+			end if:
+			if nops(indets(item2))<=0 then
+				item2:=1:
+			end if:
+			result:=result*resultant(item1,item2,x):
+		end do:
+	end do:
+	return result:
+end proc:
+
+k1:=factor(multires(j11,j22,x5)):  #2,1,4,3,2,1761,2,72
+k2:=factor(multires(j11,j33,x5)):  #2,8,832,1,4,3,2,24,3,2,3
+k3:=factor(multires(j11,j44,x5)):  #2,1,1257,4,3,2,3,33,2,3
+K:=[k1,k2,k3]:
+save K, "/root/jiubianxing/K.m":
+save k1, "/root/jiubianxing/k1.m":
+save k2, "/root/jiubianxing/k2.m":
+save k3, "/root/jiubianxing/k3.m":
+
+primnops:=proc(f)
+	local result,i,f1,len1:
+	f1:=op(2,factors(f)):
+	len1:=nops(f1):
+	result:=[]:
+	for i from 1 to len1 do
+		result := [op(result), nops(numer(op(1,op(i,f1))))]:
+	end do:
+	return result:
+end proc:
+
+largePart:=proc(f)
+	local result,i,f1,len1,item:
+	f1:=op(2,factors(f)):
+	len1:=nops(f1):
+	result:=1:
+	for i from 1 to len1 do
+		item:=(numer(op(1,op(i,f1)))):
+		if nops(item)>=nops(result) then
+			result:=item:
+		end if:
+	end do:
+	return result:
+end proc:
+
+k11:=largePart(k1):  #1761 [15,14,11]
+k22:=largePart(k2):  #832  [10,10,8]
+k33:=largePart(k3):  #1257 [14,14,9]
+
+v := [S, x3, y5];
+m1:=resultant(k11,k22,y5):
+m2:=resultant(k33,k22,y5):
+M:=[m1,m2]:
+save m1, "/root/jiubianxing/m1.m":
+save m2, "/root/jiubianxing/m2.m":
+save M, "/root/jiubianxing/M.m":
+
+m11:=largePart(m1):  #9498 [104,110]
+m22:=largePart(m2):  #7575 [92,96]
+v := [S, x3];
+
+n1:=resultant(m11,m22,x3):
+save n1, "/root/jiubianxing/n1.m":
