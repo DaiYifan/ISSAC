@@ -1,3 +1,6 @@
+#使用笛卡尔包里的一个函数（combinat，cartprod），处理交错的因式分解
+#将五个方程式�每个因式分解，形成多个方程组，求并集
+#larg函数求最长的因式分解，只是验证论文可行性。
 read "/root/jiubianxing/H.m":  # 5 polynomials
 map(nops,H);  #[141, 91, 87, 94, 76]
 
