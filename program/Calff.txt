@@ -1,0 +1,31 @@
+read""
+issac:=proc(f,v)
+	#定义变量
+	local f_num, f_flag, i,min_v,min_nops,min_tag,P
+	#获取f的变元数
+	f_flag := 1
+	f_num := nops(f)
+	
+	#寻找最小变元
+    --get  min_v
+
+	#获取最短式
+	min_nops:=op(1,H)
+    for i from 2 to f_num do
+		if min_nops > nops(op(i,f)) then
+			min_nops := op(i,f);
+			min_tag:=i;
+		end if:
+	end do:
+	
+	#剩余项和最小项求结式
+	tag:=1
+    for i from 1 to f_num do
+		if i!= min_tag
+			P[tag] := resultant(op(i,f),min_nops,min_v);
+			tag := tag + 1;
+		end if:
+	end do:
+	#存储
+end proc:
+
