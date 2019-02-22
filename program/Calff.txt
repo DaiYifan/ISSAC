@@ -1,14 +1,14 @@
 read""
 issac:=proc(f,v)
 	#定义变量
-	local f_num, f_flag, i,min_v,min_nops,min_tag,P
+	local f_num, f_flag, i,temp_v,nops_v,min_v,min_nops,min_tag,P
 	#获取f的变元数
 	f_flag := 1
 	f_num := nops(f)
 	
+	#初始消去
 	#寻找最小变元
     --get  min_v
-
 	#获取最短式
 	min_nops:=op(1,H)
     for i from 2 to f_num do
@@ -18,14 +18,36 @@ issac:=proc(f,v)
 		end if:
 	end do:
 	
-	#剩余项和最小项求结式
-	tag:=1
+	#其他剩余项和最小项求结式并分解因式
+	tag:=0
     for i from 1 to f_num do
 		if i!= min_tag
-			P[tag] := resultant(op(i,f),min_nops,min_v);
-			tag := tag + 1;
+		    tag := tag + 1;
+			P[tag] := factor(resultant(op(i,f),min_nops,min_v));
 		end if:
 	end do:
+
+/!
+	#main操作
+		##获取现有各个因式分解后的式子的拆分列表（主要剔除常数项）
+	 	##求笛卡尔积，保存各个组合
+	
+    #遍历各个组合
+		##获取当前组合的最小阶元
+		##其他剩余项和最小项求结式并分解因式求结式并因式分解	
+    #降元
+!/
+	temp_v:=[]
+    for i from 1 to nops_v do
+		if op(i,v)!=min_v then 
+			temp_v:=[op(temp_v),op(i,v)];
+		end if;
+	end do;
+	v:=temp_v;
+	nops_v:=nops_v-1;
+	
+
+	
 	#存储
 end proc:
 
