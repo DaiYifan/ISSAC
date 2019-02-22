@@ -7,6 +7,7 @@ map(nops,H);  #[141, 91, 87, 94, 76]
 
 v := [S, x3, x5, y5, y8];
 for i to 5 do print(map2(degree, op(i, H), v)) end do:
+   
 
 //一层层消去
 j1:=resultant(op(1,H), op(5,H), y8):
@@ -31,7 +32,7 @@ v := [S, x3, x5, y5];
 map2(degree, j11, v);
 map2(degree, j22, v);
 map2(degree, j33, v);
-map2(degree, j44, v);v
+map2(degree, j44, v);
 
 multires:=proc(f1,f2,x)
 	
@@ -87,6 +88,7 @@ primnops:=proc(f)
 	return result:
 end proc:
 
+
 #这一步是不是因式太多，所以决定只检验最大项
 largePart:=proc(f)
 	local result,i,f1,len1,item:
@@ -101,6 +103,7 @@ largePart:=proc(f)
 	end do:
 	return result:
 end proc:
+#large表示的情况
 
 k11:=largePart(k1):  #1761 [15,14,11]
 k22:=largePart(k2):  #832  [10,10,8]
