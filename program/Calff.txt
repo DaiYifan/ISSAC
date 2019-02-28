@@ -2,7 +2,7 @@
 read""
 issac:=proc(f,v)
 	#定义变量
-	local save_flag,L,f_num,v_num,comb_num,f_flag, i,i2,temp_v,nops_v,min_v,min_nops,min_tag,P,len,ex
+	local tag,save_flag,L,f_num,v_num,comb_num,f_flag, i,i2,temp_v,nops_v,min_v,min_nops,min_tag,P,len,ex:
 	
 	#获取f的项数
 	f_flag := 1:
@@ -15,7 +15,7 @@ issac:=proc(f,v)
 	min_v:=op(nops(v),v):
    
 	#获取最短式
-	min_nops:=op(1,H)
+	min_nops:=op(1,H):
     for i from 2 to f_num do
 		if min_nops > nops(op(i,f)) then
 			min_nops := op(i,f);
@@ -24,7 +24,7 @@ issac:=proc(f,v)
 	end do:
 	
 	#其他剩余项和最小项求结式并分解因式
-	tag:=0
+	tag:=0:
     for i from 1 to f_num do
 		if i!= min_tag then
 		    tag := tag + 1;
@@ -52,7 +52,7 @@ issac:=proc(f,v)
 	#main操作
 	while nops(v)>1 do ##判断条件变元数量大于1
 		for i from 1 to comb_num do 
-			L:=[]#初始化笛卡尔列表
+			L:=[]:#初始化笛卡尔列表
 
 			for j from 1 to nops(v) do  #遍历结式
 				len[j] := nops(P[i][j]):#获取每个结式的因式长度
@@ -66,7 +66,7 @@ issac:=proc(f,v)
 					end if: 
 					ex[j] := [op(ex),op(k,P[i][j])];#拆分结式的因式到子列表
 				end do:
-				L:=[op(L),ex[j]]#加入子列表到笛卡尔列表
+				L:=[op(L),ex[j]]:#加入子列表到笛卡尔列表
 			end do:
 
 			###求笛卡尔积，获取各个方程组合
@@ -77,7 +77,7 @@ issac:=proc(f,v)
 				r[v_num-nops_v][i2] := T[nextvalue]():#存储方程组合
 			end do:
 			comb_num := i2:#更新组合数量
-
+		end do:
     	#遍历各个组合求结式
 		for i from 1 to comb_num do
 			##获取当前方程组中的最小式
