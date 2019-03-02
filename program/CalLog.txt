@@ -1,14 +1,15 @@
-#使用笛卡尔包里的一个函数（combinat，cartprod），处理交错的因式分解
-#将五个方程式�每个因式分解，形成多个方程组，求并集
-#larg函数求最长的因式分解，只是验证论文可行性。
-
+#记得使用笛卡尔包里的一个函数课以with(combinat, cartprod)可以进行处理因式分解交错，利用这一点可以尝试将不同的记录全都区分开来。
+#要做的是将五个方程因式分解，然后交错起来，形成多个方程组，求他们的并集。
+#larg函数在这里的作用是求最长的因式。知识验证了可算性。
 
 read "/root/jiubianxing/H.m":  # 5 polynomials
 map(nops,H);  #[141, 91, 87, 94, 76]
 
 v := [S, x3, x5, y5, y8];
 for i to 5 do print(map2(degree, op(i, H), v)) end do:
+   
 
+//一层层消去
 j1:=resultant(op(1,H), op(5,H), y8):
 save j1, "/root/jiubianxing/j1.m":
 j2:=resultant(op(2,H), op(5,H), y8):
@@ -26,6 +27,7 @@ j22:=simplify(j2/x5):
 j33:=simplify(j3/(-x3*y5+2*S-3)):
 j44:=simplify(j4/x5):
 
+
 v := [S, x3, x5, y5];
 map2(degree, j11, v);
 map2(degree, j22, v);
@@ -33,27 +35,38 @@ map2(degree, j33, v);
 map2(degree, j44, v);
 
 multires:=proc(f1,f2,x)
+	
 	local result,i,j,f11,f22,item1,item2,len1,len2:
 	result:=1:
+
+	#因式分解后，去除系数
 	f11:=op(2,factors(f1)):
 	f22:=op(2,factors(f2)):
+	
+	#获得去除系数后的因式项数
 	len1:=nops(f11):
 	len2:=nops(f22):
+
+	#组合算法
 	for i from 1 to len1 do
 		for j from 1 to len2 do
+			#factors后，f11的每个因式都是（x，1）的二元式
 			item1:=numer(op(1,op(i,f11))):
 			item2:=numer(op(1,op(j,f22))):
+			#indets求变量个数，为0说明是个系数
 			if nops(indets(item1))<=0 then
 				item1:=1:
 			end if:
 			if nops(indets(item2))<=0 then
 				item2:=1:
 			end if:
+			#求结式的公式 
 			result:=result*resultant(item1,item2,x):
 		end do:
 	end do:
 	return result:
 end proc:
+
 
 k1:=factor(multires(j11,j22,x5)):  #2,1,4,3,2,1761,2,72
 k2:=factor(multires(j11,j33,x5)):  #2,8,832,1,4,3,2,24,3,2,3
@@ -75,6 +88,8 @@ primnops:=proc(f)
 	return result:
 end proc:
 
+
+#这一步是不是因式太多，所以决定只检验最大项
 largePart:=proc(f)
 	local result,i,f1,len1,item:
 	f1:=op(2,factors(f)):
@@ -88,6 +103,7 @@ largePart:=proc(f)
 	end do:
 	return result:
 end proc:
+#large表示的情况
 
 k11:=largePart(k1):  #1761 [15,14,11]
 k22:=largePart(k2):  #832  [10,10,8]
@@ -105,5 +121,90 @@ m11:=largePart(m1):  #9498 [104,110]
 m22:=largePart(m2):  #7575 [92,96]
 v := [S, x3];
 
+用这个方程
 n1:=resultant(m11,m22,x3):
 save n1, "/root/jiubianxing/n1.m":
+
+r[1]...r[32]:
+
+
+for i from 1 to 32 do
+  k1[i]:=factor(resultant(op(1,r[i]),op(2,r[i]),x5)):#n-item
+  k2[i]:=factor(resultant(op(1,r[i]),op(3,r[i]),x5)):#n1-item
+  k3[i]:=factor(resultant(op(1,r[i]),op(4,r[i]),x5)):#n2-item
+  k[i]:=[k1[i],k2[i],k3[i]]:
+end do
+#null using
+initialize(k1_ex)
+initialize(k2_ex)
+initialize(k3_ex)
+
+sum := 0#计算总数
+i2 := 1
+
+for i from 1 to 32 do 
+	len1:=nops(k1[i])
+	len2:=nops(k2[i])
+	len3:=nops(k3[i])
+	k1_ex := [op(1,k1[i])];
+	k2_ex := [op(1,k2[i])];
+	k3_ex := [op(1,k3[i])];
+	for j from 2 to len1 do
+	   k1_ex := [op(k1_ex),op(j,k1[j])];
+	for j from 2 to len2 do
+	   k2_ex := [op(k2_ex),op(j,k2[j])];
+	for j from 2 to len3 do 
+	   k3_ex := [op(k3_ex),op(j,k3[j])];
+	
+	#新建组合应该有len1*len2*len3个,收到r_2数组中
+	
+	T1 := cartprod([k1_ex,k2_ex,k3_ex])
+	while not Tfinished do
+		r_2[i2] := T1nextvalue();
+		i2 := i2+1
+		end do:
+    
+
+#然后继续求结式，消去x3
+
+i2;#先观察总共有几项
+for i from 1 to i2 do 
+	m1[i] := factor(resultant(op(1,r_2[i]),op(3,r_2[i]),x3)): 
+    m2[i] := factor(resultant(op(2,r_2[i]),op(3,r_2[i]),x3)):
+	m[i] := [m1[i],m2[i]]:
+end do
+
+i3:=1
+#最后组合S & x3
+for i from 1 to i2 do 
+  len1 := nops(m1[i])
+  len2 := nops(m2[i])
+  m1_ex := [op(1,m1[i])];
+  m2_ex := [op(1,m2[i])];
+  for j from 2 to len1 do 
+     m1_ex := [op(1,m1[i])];
+	 m2_ex := [op(1,m2[i])];
+
+	 T2:=cartprod([m1_ex,m2_ex])
+	 while not Tfinished do 
+	    r_3[i3]:=T2nextvalue();
+	    i3 := i3+1
+	    end do:
+
+for i from 1 to i3 
+n[i]:=resultant(op(1,r_3[i]),op(2,r_3[i],x3));
+
+
+
+
+  
+ 
+how to create the jushiya-path of T1?
+
+
+到这一步有些项会拆成很多份。
+此时先获取每一项的系数？
+
+
+
+

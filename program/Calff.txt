@@ -1,0 +1,118 @@
+#读取文件
+read""
+issac:=proc(f,v)
+	#定义变量
+	local tag,save_flag,L,f_num,v_num,comb_num,f_flag, i,i2,temp_v,nops_v,min_v,min_nops,min_tag,P,len,ex:
+	
+	#获取f的项数
+	f_flag := 1:
+	f_num := nops(f):#方程项数
+	v_num := nops(v):#变元数
+	comb_num := 1:#组合数初始值为1
+	save_flag := 1:
+
+	#寻找最小变元
+	min_v:=op(nops(v),v):
+   
+	#获取最短式
+	min_nops:=op(1,H):
+    for i from 2 to f_num do
+		if min_nops > nops(op(i,f)) then
+			min_nops := op(i,f);
+			min_tag:=i;
+		end if:
+	end do:
+	
+	#其他剩余项和最小项求结式并分解因式
+	tag:=0:
+    for i from 1 to f_num do
+		if i!= min_tag then
+		    tag := tag + 1;
+			P[1][tag] := factor(resultant(op(i,f),min_nops,min_v));
+		end if:
+	end do:
+
+	
+	#更新v
+	v_num:=v_num-1:
+	temp_v:=[];
+	for i from 1 to v_num do
+		temp_v := [op(temp_v),op(i,v)]:
+	end do:
+
+	#保存结式
+	for i from 1 to tag do 
+		s:=sprintf("lev%d-P[1][%d].m",save_flag,i):
+		rs:=P[1][i]:
+		save rs,s:
+	end do:
+	save_flag := saveflag + 1:
+
+    with(combinat,cartprod)
+	#main操作
+	while nops(v)>1 do ##判断条件变元数量大于1
+		for i from 1 to comb_num do 
+			L:=[]:#初始化笛卡尔列表
+
+			for j from 1 to nops(v) do  #遍历结式
+				len[j] := nops(P[i][j]):#获取每个结式的因式长度
+				ex[j] := []:#初始化每个结式的笛卡尔子列表
+			end do:
+
+			for j from 1 to nops(v) do
+				for k from 1 to len[j] do
+					if nops(indets(op(1,P[i][j]))) !=0 then
+						continue;#去除常数项
+					end if: 
+					ex[j] := [op(ex),op(k,P[i][j])];#拆分结式的因式到子列表
+				end do:
+				L:=[op(L),ex[j]]:#加入子列表到笛卡尔列表
+			end do:
+
+			###求笛卡尔积，获取各个方程组合
+			i2 := 0:
+			T:=cartprod(L):
+			while not T[finished] do 
+				i2:=i2+1:
+				r[v_num-nops_v][i2] := T[nextvalue]():#存储方程组合
+			end do:
+			comb_num := i2:#更新组合数量
+		end do:
+    	#遍历各个组合求结式
+		for i from 1 to comb_num do
+			##获取当前方程组中的最小式
+			min_nops:=op(1,r[v_num-nops_v][i]):
+    		for j from 2 to f_num do
+				if min_nops > nops(op(j,r[v_num-nops_v][i])) then
+					min_nops := op(j,r[v_num-nops_v][i]):
+					min_tag := j:
+				end if:
+			end do:
+
+			##其他剩余项和最小项求结式并分解因式
+			tag := 0:
+			for j from 1 to nops_v do 
+				if j!=min_tag then 
+					tag:=tag+1:
+					P[i][tag] := factor(resultant(op(j,r[v_num-nops_v][i]),min_nops,min_v));
+					
+					#保存
+					s:=sprintf("lev%d-P[%d][%d].m",save_flag,i,tag):
+					rs:=P[i][tag]:
+					save rs,s:
+
+				end if:
+			end do: 
+		end do:
+		save_flag := save_flag + 1:
+
+    	#变元集合降元进入下一轮main操作
+		v_num := v_num - 1:
+		temp_ v := []:
+		for i from 1 to v_num do
+			temp_v := [op(temp_v),op(i,v)]:
+		end do:
+		v := temp_v:
+	end do:	
+end proc:
+
