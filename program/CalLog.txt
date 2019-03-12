@@ -162,7 +162,7 @@ for i from 1 to 32 do
 	while not Tfinished do
 		r_2[i2] := T1nextvalue();
 		i2 := i2+1
-		end do:
+	end do:
     
 
 #然后继续求结式，消去x3

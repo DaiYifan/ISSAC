@@ -1,7 +1,7 @@
 #读取文件
 read""
 issac:=proc(f,v)
-	#定义变量
+
 	local tag,save_flag,L,f_num,v_num,comb_num,f_flag, i,i2,temp_v,nops_v,min_v,min_nops,min_tag,P,len,ex:
 	
 	#获取f的项数
